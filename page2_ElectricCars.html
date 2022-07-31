@@ -1,0 +1,52 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style> rect {fill: gold; stroke: blue;} 
+        text {font-size: 18px;}
+</style>
+<body onload='init()'>
+  <h1 style = "text-align:center;">Highway MPG Performance of Electric Cars</h1>
+  <p style = "text-align:center; font-size:140%;">As seen on the main page, electric cars significantly outperform those powered by gasoline or diesel in highway and city MPG. <br>This plot below compares the average highway MPG of electric cars produced by various manufactures.
+  </p>
+<svg width=2600 height=2600>
+     
+     <text x = "1000" y = "720" font-weight = "bold">Average Highway MPG</text>text>
+
+</svg>
+<script>
+async function init() {
+var x_scale = d3.scaleLinear().domain([80,130]).range([0,600]);
+var y_scale = d3.scaleBand().domain([0,1,2,3,4,5,6,7,8,9]).range([600,0]);
+
+d3.select("svg").append("g").attr("transform", "translate(800,50)")
+d3.csv("https://flunky.github.io/cars2017.csv", d3.autoType).then( 
+    function (d){
+        for (var i = 0; i < d.length; i++){
+         d3.select("g").selectAll("rect").data(d).enter().append("rect")
+         .filter(function(d) { return d.Fuel === 'Electricity'})
+         .attr("x", 0)
+         .attr("y", function(d,i){return y_scale(i);})
+         .attr("width", function(d){return x_scale(d.AverageHighwayMPG);})
+         .attr("height", 40);
+
+         d3.select("g").selectAll("text").data(d).enter().append("text")
+         .filter(function(d) { return d.Fuel === 'Electricity'})
+         .attr("x", function(d){return ( 20 + x_scale(d.AverageHighwayMPG));})
+         .attr("y", function(d,i){return (30 + y_scale(i));})
+         .text(function(d){return d.Make;})
+         .attr("fill", "olive")
+          
+  }
+});
+
+var y_axis = d3.axisLeft(y_scale)
+               .tickFormat(d3.format("~s"));
+d3.select("svg").append("g").attr("transform", "translate(800,50)")
+  .call(y_axis);
+var x_axis = d3.axisBottom(x_scale)
+               .tickFormat(d3.format("~s"));
+d3.select("svg").append("g").attr("transform", "translate(800,650)")
+  .call(x_axis);
+}
+</script>
+</body>
+</html>
